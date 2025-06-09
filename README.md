@@ -31,9 +31,12 @@ cd swig-elizaos-plugin
 
 ```bash
 bun install
+
+# Install dependencies for examples:
+bun run install:examples
 ```
 
-3. Build the plugin and examples:
+1. Build the plugin and examples:
 
 ```bash
 bun run build
@@ -49,6 +52,7 @@ bun run build
 
 ### Running Examples
 
+- `bun run install:examples` - Install dependencies for the ElizaOS example
 - `bun run start:examples` - Start the ElizaOS CLI with the Swig plugin
 - `bun run clean:examples` - Clean the examples workspace
 

@@ -5,15 +5,13 @@
   "type": "module",
   "packageManager": "bun@1.2.15",
   "workspaces": [
-    "packages/*",
-    "examples/eliza",
-    "examples/eliza/packages/*",
-    "examples/eliza/plugin-specification/*"
+    "packages/*"
   ],
   "scripts": {
     "build": "nx run-many --target=build --projects=@swig-wallet/plugin-elizaos,examples --parallel=false",
     "build:plugin": "nx run @swig-wallet/plugin-elizaos:build",
     "build:examples": "nx run examples:build",
+    "install:examples": "cd examples/eliza && bun install",
     "start:examples": "cd examples/eliza && bun run start",
     "clean:examples": "cd examples/eliza && bun run clean",
     "dev": "nx run @swig-wallet/plugin-elizaos:dev",
