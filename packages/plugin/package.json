@@ -48,11 +48,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/elizaos/eliza/tree/main/packages/plugin-swig",
+  "homepage": "https://onswig.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/elizaos/eliza.git",
-    "directory": "packages/plugin-swig"
+    "url": "https://github.com/anagrambuild/swig-elizaos-plugin"
   },
   "license": "AGPL-3.0",
   "description": "Swig wallet plugin for ElizaOS",
