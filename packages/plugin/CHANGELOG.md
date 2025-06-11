@@ -1,5 +1,11 @@
 # @swig-wallet/plugin-elizaos
 
+## 1.0.2
+
+### Patch Changes
+
+- d14b371: Change license to MIT
+
 ## 1.0.1
 
 ### Patch Changes
