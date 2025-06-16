@@ -88,8 +88,8 @@ export const swigTransferTokenToAuthorityAction: Action = {
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
-    state?: State,
-    options?: any,
+    _state?: State,
+    _options?: any,
     callback?: HandlerCallback,
     responses?: Memory[]
   ): Promise<boolean> => {
@@ -97,6 +97,31 @@ export const swigTransferTokenToAuthorityAction: Action = {
     console.log('🔧 Callback function present:', !!callback);
     console.log('🔧 Message content:', message.content.text);
     console.log('🔧 Responses array length:', responses?.length || 0);
+
+    // Check if transfers are enabled
+    const transfersEnabledSetting = runtime.getSetting('SWIG_TRANSFERS_ENABLED');
+    const transfersEnabled =
+      transfersEnabledSetting === undefined ? true : String(transfersEnabledSetting) === 'true';
+
+    if (!transfersEnabled) {
+      console.log('🔧 Transfer operation blocked - transfers are disabled');
+      const errorContent = {
+        text: `❌ Transfer operations are currently disabled. Set SWIG_TRANSFERS_ENABLED=true to enable transfers.`,
+        thought: 'Transfer operations have been disabled in the plugin configuration.',
+        actions: ['SWIG_TRANSFER_TOKEN_TO_AUTHORITY', 'REPLY'],
+        source: message.content.source,
+      };
+
+      if (responses && responses.length > 0) {
+        responses[0].content = errorContent;
+      }
+
+      if (callback) {
+        await callback(errorContent);
+      }
+
+      return true;
+    }
 
     try {
       console.log('🔧 Step 1: Getting Solana wallet...');
@@ -299,7 +324,9 @@ export const swigTransferTokenToAuthorityAction: Action = {
       console.error('🔧 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
 
       const errorContent = {
-        text: `❌ Failed to transfer token from Swig wallet to authority: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        text: `❌ Failed to transfer token from Swig wallet to authority: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
         thought:
           'The token transfer from Swig wallet to authority failed. This could be due to insufficient token balance, invalid authority, insufficient permissions, or network issues.',
         actions: ['SWIG_TRANSFER_TOKEN_TO_AUTHORITY', 'REPLY'],

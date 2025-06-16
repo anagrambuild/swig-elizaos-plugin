@@ -39,14 +39,55 @@ Set these environment variables or add them to your character's settings:
 - `SOLANA_PRIVATE_KEY`: Your Solana wallet private key (as JSON array or base58 string)
 - `SOLANA_RPC_URL`: Solana RPC endpoint (optional, defaults to mainnet)
 
+### Optional Settings
+
+Configure plugin behavior with these optional settings:
+
+- `SWIG_TRANSFERS_ENABLED`: Enable/disable all transfer functionality (default: `true`)
+- `SWIG_AUTHORITY_MANAGEMENT_ENABLED`: Enable/disable authority management functionality (default: `true`)
+
+#### Transfer Control
+
+You can disable all transfer functionality by setting:
+
+```bash
+SWIG_TRANSFERS_ENABLED=false
+```
+
+When transfers are disabled, the agent will only have access to:
+
+- Creating Swig wallets
+- Checking Swig wallet balances (SOL and SPL tokens)
+- Viewing Swig wallet authorities
+- Querying wallet information
+
+Transfer actions (sending SOL/tokens to/from Swig wallets) will not be available.
+
+#### Authority Management Control
+
+You can disable authority management functionality by setting:
+
+```bash
+SWIG_AUTHORITY_MANAGEMENT_ENABLED=false
+```
+
+When authority management is disabled, the agent will not have access to:
+
+- Adding new authorities to Swig wallets
+- Removing authorities from Swig wallets
+
+The agent can still view existing authorities but cannot modify them.
+
 #### Environment Variables
 
 ```bash
-# base58 format
+# Required
 SOLANA_PRIVATE_KEY='your_base58_private_key'
 
-# RPC URL (optional)
+# Optional
 SOLANA_RPC_URL='https://api.mainnet-beta.solana.com'
+SWIG_TRANSFERS_ENABLED='true'  # Set to 'false' to disable transfers
+SWIG_AUTHORITY_MANAGEMENT_ENABLED='true'  # Set to 'false' to disable authority management
 ```
 
 #### Character Settings
@@ -58,7 +99,9 @@ SOLANA_RPC_URL='https://api.mainnet-beta.solana.com'
   "settings": {
     "secrets": {
       "SOLANA_PRIVATE_KEY": "abc123...",
-      "SOLANA_RPC_URL": "https://api.mainnet-beta.solana.com"
+      "SOLANA_RPC_URL": "https://api.mainnet-beta.solana.com",
+      "SWIG_TRANSFERS_ENABLED": "true",
+      "SWIG_AUTHORITY_MANAGEMENT_ENABLED": "true"
     }
   }
 }
