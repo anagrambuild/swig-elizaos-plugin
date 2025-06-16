@@ -1,6 +1,6 @@
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
+import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import { IAgentRuntime, UUID } from '@elizaos/core';
-import { SolanaWalletProvider } from './types.js';
+import { SolanaWalletProvider, SwigPluginConfig } from './types.js';
 
 /**
  * Get Solana connection from runtime settings
@@ -94,4 +94,47 @@ export function formatSOL(lamports: number): string {
  */
 export function parseSOL(sol: string | number): number {
   return Math.round(Number(sol) * 1e9);
+}
+
+/**
+ * Get Swig plugin configuration from runtime settings
+ */
+export function getSwigConfig(runtime: IAgentRuntime): SwigPluginConfig {
+  const transfersEnabled = runtime.getSetting('SWIG_TRANSFERS_ENABLED');
+
+  return {
+    transfersEnabled: transfersEnabled === undefined ? true : String(transfersEnabled) === 'true',
+  };
+}
+
+/**
+ * Check if transfers are enabled in the configuration
+ */
+export function areTransfersEnabled(runtime: IAgentRuntime): boolean {
+  const config = getSwigConfig(runtime);
+  return config.transfersEnabled ?? true;
+}
+
+/**
+ * Validate if transfers are enabled and return error content if not
+ */
+export function validateTransfersEnabled(
+  runtime: IAgentRuntime,
+  actionName: string,
+  messageSource?: string
+) {
+  const transfersEnabledSetting = runtime.getSetting('SWIG_TRANSFERS_ENABLED');
+  const transfersEnabled =
+    transfersEnabledSetting === undefined ? true : String(transfersEnabledSetting) === 'true';
+
+  if (!transfersEnabled) {
+    return {
+      text: `❌ Transfer operations are currently disabled. Set SWIG_TRANSFERS_ENABLED=true to enable transfers.`,
+      thought: 'Transfer operations have been disabled in the plugin configuration.',
+      actions: [actionName, 'REPLY'],
+      source: messageSource,
+    };
+  }
+
+  return null; // No error, transfers enabled
 }

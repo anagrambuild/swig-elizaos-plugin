@@ -11,31 +11,66 @@ import { swigTransferTokenToAddressAction } from './actions/swigTransferTokenToA
 import { swigTransferTokenToAuthorityAction } from './actions/swigTransferTokenToAuthority.js';
 import { getSwigTokenBalanceAction } from './actions/getSwigTokenBalance.js';
 
+// Helper function to determine if transfers are enabled
+function areTransfersEnabled(runtime: any): boolean {
+  const transfersEnabledSetting = runtime.getSetting('SWIG_TRANSFERS_ENABLED');
+
+  // Default to enabled for backwards compatibility
+  const transfersEnabled =
+    transfersEnabledSetting === undefined ? true : String(transfersEnabledSetting) === 'true';
+
+  return transfersEnabled;
+}
+
+// Define read-only actions (always available)
+const readOnlyActions = [
+  createSwigAction,
+  getSwigBalanceAction,
+  getSwigAuthoritiesAction,
+  getSwigTokenBalanceAction,
+];
+
+// Define transfer actions (conditionally available)
+const transferActions = [
+  transferToSwigAction,
+  addSwigAuthorityAction,
+  swigTransferToAddressAction,
+  transferTokenToSwigAction,
+  swigTransferToAuthorityAction,
+  swigTransferTokenToAddressAction,
+  swigTransferTokenToAuthorityAction,
+];
+
 export const swigPlugin: Plugin = {
   name: 'swig',
   description: 'Swig smart wallet plugin for Solana - create and manage Swig wallets.',
 
-  actions: [
-    createSwigAction,
-    transferToSwigAction,
-    getSwigBalanceAction,
-    addSwigAuthorityAction,
-    getSwigAuthoritiesAction,
-    swigTransferToAddressAction,
-    transferTokenToSwigAction,
-    swigTransferToAuthorityAction,
-    swigTransferTokenToAddressAction,
-    swigTransferTokenToAuthorityAction,
-    getSwigTokenBalanceAction,
-  ],
+  actions: [], // Will be populated during initialization
 
-  // Plugin initialization (optional)
+  // Plugin initialization
   init: async (config, runtime) => {
+    /* eslint-disable no-console */
     console.log('🔌 Initializing Swig plugin...');
+
+    // Determine which actions to enable based on configuration
+    const transfersEnabled = areTransfersEnabled(runtime);
+    const availableActions = transfersEnabled
+      ? [...readOnlyActions, ...transferActions]
+      : readOnlyActions;
+
+    // Set the actions array
+    swigPlugin.actions = availableActions;
+
     console.log(
       '🔌 Plugin actions:',
       swigPlugin.actions?.map((a) => a.name)
     );
+
+    console.log('🔌 Transfer actions enabled:', transfersEnabled);
+    if (!transfersEnabled) {
+      console.log('🔒 Transfer actions are disabled');
+      console.log('🔒 To enable transfers, set SWIG_TRANSFERS_ENABLED=true');
+    }
 
     // Validate required settings
     const privateKey = runtime.getSetting('SOLANA_PRIVATE_KEY');

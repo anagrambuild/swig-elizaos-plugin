@@ -13,6 +13,10 @@ export interface SwigWalletConfig {
   commitment?: string;
 }
 
+export interface SwigPluginConfig {
+  transfersEnabled?: boolean;
+}
+
 export interface SwigAuthority {
   roleId: number;
   address: string;
