@@ -15,6 +15,7 @@ export interface SwigWalletConfig {
 
 export interface SwigPluginConfig {
   transfersEnabled?: boolean;
+  authorityManagementEnabled?: boolean;
 }
 
 export interface SwigAuthority {

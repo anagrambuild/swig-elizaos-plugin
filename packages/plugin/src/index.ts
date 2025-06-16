@@ -3,6 +3,7 @@ import { createSwigAction } from './actions/createSwig.js';
 import { transferToSwigAction } from './actions/transferToSwig.js';
 import { getSwigBalanceAction } from './actions/getSwigBalance.js';
 import { addSwigAuthorityAction } from './actions/addSwigAuthority.js';
+import { removeSwigAuthorityAction } from './actions/removeSwigAuthority.js';
 import { getSwigAuthoritiesAction } from './actions/getSwigAuthorities.js';
 import { swigTransferToAddressAction } from './actions/swigTransferToAddress.js';
 import { transferTokenToSwigAction } from './actions/transferTokenToSwig.js';
@@ -22,6 +23,19 @@ function areTransfersEnabled(runtime: any): boolean {
   return transfersEnabled;
 }
 
+// Helper function to determine if authority management is enabled
+function isAuthorityManagementEnabled(runtime: any): boolean {
+  const authorityManagementEnabledSetting = runtime.getSetting('SWIG_AUTHORITY_MANAGEMENT_ENABLED');
+
+  // Default to enabled for backwards compatibility
+  const authorityManagementEnabled =
+    authorityManagementEnabledSetting === undefined
+      ? true
+      : String(authorityManagementEnabledSetting) === 'true';
+
+  return authorityManagementEnabled;
+}
+
 // Define read-only actions (always available)
 const readOnlyActions = [
   createSwigAction,
@@ -33,13 +47,15 @@ const readOnlyActions = [
 // Define transfer actions (conditionally available)
 const transferActions = [
   transferToSwigAction,
-  addSwigAuthorityAction,
   swigTransferToAddressAction,
   transferTokenToSwigAction,
   swigTransferToAuthorityAction,
   swigTransferTokenToAddressAction,
   swigTransferTokenToAuthorityAction,
 ];
+
+// Define authority management actions (conditionally available)
+const authorityManagementActions = [addSwigAuthorityAction, removeSwigAuthorityAction];
 
 export const swigPlugin: Plugin = {
   name: 'swig',
@@ -54,9 +70,17 @@ export const swigPlugin: Plugin = {
 
     // Determine which actions to enable based on configuration
     const transfersEnabled = areTransfersEnabled(runtime);
-    const availableActions = transfersEnabled
-      ? [...readOnlyActions, ...transferActions]
-      : readOnlyActions;
+    const authorityManagementEnabled = isAuthorityManagementEnabled(runtime);
+
+    let availableActions = [...readOnlyActions];
+
+    if (transfersEnabled) {
+      availableActions = [...availableActions, ...transferActions];
+    }
+
+    if (authorityManagementEnabled) {
+      availableActions = [...availableActions, ...authorityManagementActions];
+    }
 
     // Set the actions array
     swigPlugin.actions = availableActions;
@@ -70,6 +94,12 @@ export const swigPlugin: Plugin = {
     if (!transfersEnabled) {
       console.log('🔒 Transfer actions are disabled');
       console.log('🔒 To enable transfers, set SWIG_TRANSFERS_ENABLED=true');
+    }
+
+    console.log('🔌 Authority management actions enabled:', authorityManagementEnabled);
+    if (!authorityManagementEnabled) {
+      console.log('🔒 Authority management actions are disabled');
+      console.log('🔒 To enable authority management, set SWIG_AUTHORITY_MANAGEMENT_ENABLED=true');
     }
 
     // Validate required settings
@@ -93,6 +123,7 @@ export * from './actions/createSwig.js';
 export * from './actions/transferToSwig.js';
 export * from './actions/getSwigBalance.js';
 export * from './actions/addSwigAuthority.js';
+export * from './actions/removeSwigAuthority.js';
 export * from './actions/getSwigAuthorities.js';
 export * from './actions/swigTransferToAddress.js';
 export * from './actions/transferTokenToSwig.js';

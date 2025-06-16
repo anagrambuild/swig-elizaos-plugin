@@ -101,9 +101,14 @@ export function parseSOL(sol: string | number): number {
  */
 export function getSwigConfig(runtime: IAgentRuntime): SwigPluginConfig {
   const transfersEnabled = runtime.getSetting('SWIG_TRANSFERS_ENABLED');
+  const authorityManagementEnabled = runtime.getSetting('SWIG_AUTHORITY_MANAGEMENT_ENABLED');
 
   return {
     transfersEnabled: transfersEnabled === undefined ? true : String(transfersEnabled) === 'true',
+    authorityManagementEnabled:
+      authorityManagementEnabled === undefined
+        ? true
+        : String(authorityManagementEnabled) === 'true',
   };
 }
 
@@ -113,6 +118,14 @@ export function getSwigConfig(runtime: IAgentRuntime): SwigPluginConfig {
 export function areTransfersEnabled(runtime: IAgentRuntime): boolean {
   const config = getSwigConfig(runtime);
   return config.transfersEnabled ?? true;
+}
+
+/**
+ * Check if authority management is enabled in the configuration
+ */
+export function isAuthorityManagementEnabled(runtime: IAgentRuntime): boolean {
+  const config = getSwigConfig(runtime);
+  return config.authorityManagementEnabled ?? true;
 }
 
 /**
@@ -137,4 +150,30 @@ export function validateTransfersEnabled(
   }
 
   return null; // No error, transfers enabled
+}
+
+/**
+ * Validate if authority management is enabled and return error content if not
+ */
+export function validateAuthorityManagementEnabled(
+  runtime: IAgentRuntime,
+  actionName: string,
+  messageSource?: string
+) {
+  const authorityManagementEnabledSetting = runtime.getSetting('SWIG_AUTHORITY_MANAGEMENT_ENABLED');
+  const authorityManagementEnabled =
+    authorityManagementEnabledSetting === undefined
+      ? true
+      : String(authorityManagementEnabledSetting) === 'true';
+
+  if (!authorityManagementEnabled) {
+    return {
+      text: `❌ Authority management operations are currently disabled. Set SWIG_AUTHORITY_MANAGEMENT_ENABLED=true to enable authority management.`,
+      thought: 'Authority management operations have been disabled in the plugin configuration.',
+      actions: [actionName, 'REPLY'],
+      source: messageSource,
+    };
+  }
+
+  return null; // No error, authority management enabled
 }

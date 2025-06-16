@@ -44,6 +44,7 @@ Set these environment variables or add them to your character's settings:
 Configure plugin behavior with these optional settings:
 
 - `SWIG_TRANSFERS_ENABLED`: Enable/disable all transfer functionality (default: `true`)
+- `SWIG_AUTHORITY_MANAGEMENT_ENABLED`: Enable/disable authority management functionality (default: `true`)
 
 #### Transfer Control
 
@@ -62,6 +63,21 @@ When transfers are disabled, the agent will only have access to:
 
 Transfer actions (sending SOL/tokens to/from Swig wallets) will not be available.
 
+#### Authority Management Control
+
+You can disable authority management functionality by setting:
+
+```bash
+SWIG_AUTHORITY_MANAGEMENT_ENABLED=false
+```
+
+When authority management is disabled, the agent will not have access to:
+
+- Adding new authorities to Swig wallets
+- Removing authorities from Swig wallets
+
+The agent can still view existing authorities but cannot modify them.
+
 #### Environment Variables
 
 ```bash
@@ -71,6 +87,7 @@ SOLANA_PRIVATE_KEY='your_base58_private_key'
 # Optional
 SOLANA_RPC_URL='https://api.mainnet-beta.solana.com'
 SWIG_TRANSFERS_ENABLED='true'  # Set to 'false' to disable transfers
+SWIG_AUTHORITY_MANAGEMENT_ENABLED='true'  # Set to 'false' to disable authority management
 ```
 
 #### Character Settings
@@ -83,7 +100,8 @@ SWIG_TRANSFERS_ENABLED='true'  # Set to 'false' to disable transfers
     "secrets": {
       "SOLANA_PRIVATE_KEY": "abc123...",
       "SOLANA_RPC_URL": "https://api.mainnet-beta.solana.com",
-      "SWIG_TRANSFERS_ENABLED": "true"
+      "SWIG_TRANSFERS_ENABLED": "true",
+      "SWIG_AUTHORITY_MANAGEMENT_ENABLED": "true"
     }
   }
 }
